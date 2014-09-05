@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 
 """
-Parse a single FASTA record from stdin and print it.
+read out the 100 longest sequences, in the form (3120, ACTGGG...)
 """
+# input: ./day3homework.py < transcripts.gtf
+
 import sys
 
 from fasta import FASTAReader 
@@ -34,4 +36,32 @@ aminoAcidMap = {"TTT" : "F", "TTC" : "F", "TTA" : "L", "TTG" : "L", "TCT" : "S",
                 "GCT" : "A","GCC" : "A","GCA" : "A", "GCG" : "A", "GAT" : "D", "GAC" : "D", "GAA" : "E","GAG" : "E",
                 "GGT" : "G", "GGC" : "G", "GGA" : "G", "GGG" : "G"}
 
-  
+#taken from https://github.com/mtarbit/Rosalind-Problems/blob/master/e017-orf.py
+def translate_codon(codon):
+    protein = None
+    if len(codon) == 3 and DNA_CODON_TABLE.has_key(codon):
+        protein = DNA_CODON_TABLE[codon]
+    return protein
+
+#based on https://github.com/mtarbit/Rosalind-Problems/blob/master/e017-orf.py
+list_results = []
+list_indices = []
+l = len(s)
+for i in range(l):
+    protein = translate_codon(s[i:i+3])
+    if protein and protein == 'M':
+        list_indices.append(i)
+for i in list_indices:
+    found_stop = False
+    protein_string = ''
+    for j in range(i, l, 3):
+        protein = translate_codon(s[j:j+3])
+        if not protein:
+            break
+        if protein == 'Stop':
+            found_stop = True
+            break
+        protein_string += protein
+    if found_stop:
+        list_results.append(protein_string)
+print list_results
